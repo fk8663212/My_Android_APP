@@ -12,7 +12,7 @@
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="BMI計算器"
+        android:text="@string/text_title"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -22,48 +22,52 @@
         app:layout_constraintVertical_bias="0.125" />
 
     <EditText
-        android:id="@+id/editTextText3"
+        android:id="@+id/editTextText_hight"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
         android:layout_marginTop="48dp"
         android:ems="10"
         android:inputType="text"
-        android:text="輸入身高(m)"
-        android:textColor="#87000000"
+        android:text=""
+        android:hint="@string/ET_hight"
+        android:textColor="#87949494"
         android:textColorHighlight="#FFFFFF"
         android:textColorHint="#87FFFFFF"
-        app:layout_constraintEnd_toEndOf="@id/editTextText2"
-        app:layout_constraintTop_toTopOf="@id/editTextText2" />
+        app:layout_constraintEnd_toEndOf="@id/editTextText_weight"
+        app:layout_constraintTop_toTopOf="@id/editTextText_weight" />
 
     <EditText
-        android:id="@+id/editTextText"
+        android:id="@+id/editTextText_name"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="100dp"
+        android:autofillHints="username"
         android:ems="10"
         android:inputType="text"
-        android:text="輸入姓名"
-        android:textColor="#87000000"
+        android:text=""
+        android:hint="@string/ET_nane"
+        android:textColor="#87949494"
         android:textColorHighlight="#FFFFFF"
         android:textColorHint="#87FFFFFF"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
     <EditText
-        android:id="@+id/editTextText2"
+        android:id="@+id/editTextText_weight"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
         android:layout_marginTop="4dp"
         android:layout_marginEnd="100dp"
         android:ems="10"
+        android:hint="@string/ET_weight"
         android:inputType="text"
-        android:text="輸入體重(kg)"
-        android:textColor="#87000000"
+        android:text=""
+        android:textColor="#87949494"
         android:textColorHighlight="#87FFFFFF"
         android:textColorHint="#87FFFFFF"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextText" />
+        app:layout_constraintTop_toBottomOf="@+id/editTextText_name" />
 
     <RadioGroup
         android:id="@+id/radioGroup"
@@ -74,20 +78,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextText3">
+        app:layout_constraintTop_toBottomOf="@+id/editTextText_hight">
 
         <RadioButton
-            android:id="@+id/radioButton"
+            android:id="@+id/radioButton_boy"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:checked="true"
-            android:text="男" />
+            android:text="@string/RB_boy" />
 
         <RadioButton
-            android:id="@+id/radioButton2"
+            android:id="@+id/radioButton_girl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="女" />
+            android:text="@string/RB_girl" />
     </RadioGroup>
 
     <Button
@@ -95,7 +99,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="計算BMI"
+        android:text="@string/btn_bmi"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
@@ -106,7 +110,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="結果"
+        android:text="@string/text_result"
         android:textColor="#FF0000"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -120,8 +124,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="160dp"
         android:layout_marginEnd="16dp"
-        android:text="姓名"
-        app:layout_constraintEnd_toStartOf="@+id/editTextText"
+        android:text="@string/text_neame"
+        app:layout_constraintEnd_toStartOf="@+id/editTextText_name"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
@@ -129,7 +133,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="28dp"
-        android:text="體重"
+        android:text="@string/text_weight"
         app:layout_constraintEnd_toEndOf="@+id/textView4"
         app:layout_constraintTop_toBottomOf="@+id/textView4" />
 
@@ -137,11 +141,11 @@
         android:id="@+id/textView7"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="64dp"
-        android:layout_marginTop="60dp"
-        android:text="性別"
-        app:layout_constraintEnd_toEndOf="@+id/textView6"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="64dp"
+        android:text="@string/text_gender"
+        app:layout_constraintEnd_toStartOf="@+id/radioGroup"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/textView6"
         app:layout_constraintTop_toBottomOf="@+id/textView6" />
 
     <TextView
@@ -149,10 +153,30 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="28dp"
-        android:text="身高"
-        app:layout_constraintEnd_toStartOf="@+id/editTextText3"
+        android:text="@string/text_hight"
+        app:layout_constraintEnd_toStartOf="@+id/editTextText_hight"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/textView5"
         app:layout_constraintTop_toBottomOf="@+id/textView5" />
+
+    <TextView
+        android:id="@+id/kg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="13dp"
+        android:text="kg"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/editTextText_weight"
+        app:layout_constraintTop_toTopOf="@+id/editTextText_weight" />
+
+    <TextView
+        android:id="@+id/textView9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="m"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/editTextText_hight"
+        app:layout_constraintTop_toTopOf="@+id/editTextText_hight" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
