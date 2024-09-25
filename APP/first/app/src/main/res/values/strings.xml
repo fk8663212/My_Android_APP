@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">first</string>
+    <string name="title">猜拳遊戲</string>
+    <string name="textinputname">輸入玩家名稱開始遊戲</string>
+    <string name="inputname">輸入玩家名稱</string>
+    <string name="btn_scissor">剪刀</string>
+    <string name="btn_stone">石頭</string>
+    <string name="btn_paper">布</string>
+    <string name="btn_mora">猜拳</string>
+    <string name="text1">玩家出拳</string>
+    <string name="text2">電腦出拳</string>
+    <string name="text3">名字</string>
+    <string name="text4">勝利者</string>
+</resources>
