@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ListView
 import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.Toast
@@ -34,6 +35,8 @@ class MainActivity : AppCompatActivity() {
         //data base
         dbrw = MyDBHelp.MyDBHelper(this, "myDB", 1).writableDatabase
         adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, items)
+        findViewById<ListView>(R.id.LV_bmi).adapter = adapter
+
 
 
 
@@ -65,7 +68,7 @@ class MainActivity : AppCompatActivity() {
                 }catch (e: Exception){
                     showToast("新增失敗$e")
 
-                    textView.text = e.toString()
+                    //textView.text = e.toString()
                     return@registerForActivityResult
                 }
 
@@ -120,6 +123,19 @@ class MainActivity : AppCompatActivity() {
             else
                 try {
                     dbrw.execSQL("DELETE FROM myTable WHERE username = ?", arrayOf(editText.text.toString()))
+                    showToast("刪除成功")
+                }catch (e: Exception){
+                    showToast("修改失敗: ${e.message}")
+                }
+        }
+        button3.setOnClickListener{
+            if (editText.length() < 1 || editText2.length() < 1 || editText3.length() < 1)
+                showToast("請重新輸入姓名身高體重")
+            else
+                try{
+                    val bmi = editText2.text.toString().toFloat()/((editText3.text.toString().toFloat()/100)*(editText3.text.toString().toFloat()/100))
+                    dbrw.execSQL("UPDATE myTable SET bmi = ? WHERE username = ?", arrayOf(bmi.toString(), editText.text.toString()))
+                    showToast("修改成功")
                 }catch (e: Exception){
                     showToast("修改失敗: ${e.message}")
                 }
@@ -128,6 +144,15 @@ class MainActivity : AppCompatActivity() {
         button4.setOnClickListener{
             val c = dbrw.rawQuery("SELECT * FROM myTable", null)
             c.moveToFirst()
+            items.clear()
+            showToast("共有${c.count}筆資料")
+            for (i in 0 until c.count) {
+                items.add("使用者:${c.getString(0)}, BMI:${c.getString(1)}")
+                c.moveToNext()
+            }
+            adapter.notifyDataSetChanged()
+            c.close()
+
         }
 
 
