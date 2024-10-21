@@ -29,6 +29,7 @@ class MainActivity2 : AppCompatActivity() {
         val button = findViewById<Button>(R.id.btn_back)
         val bmi = weight / (hight * hight)
 
+
         textView.text="${name}您的身高:${hight*100}公分\n體重:${weight}公斤\nBMI為${bmi}"
         button.setOnClickListener {
             val intent = Intent().putExtra("BMI",bmi)
