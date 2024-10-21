@@ -86,6 +86,11 @@ class MainActivity : AppCompatActivity() {
                         cursor ->
                         items.clear()
                         showToast("查詢書名${ed_book.text},價格${ed_price.text}")
+                        val c =dbrw.rawQuery("SELECT * FROM myTable", null)
+                        for(i in 0 until cursor.count){
+                            cursor.moveToNext()
+                            items.add("書名:${cursor.getString(0)}				價格:${cursor.getInt(1)}")
+                        }
 
 
 
