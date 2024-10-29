@@ -13,6 +13,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.room.Room
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
 import kotlin.math.pow
 
 class MainActivity : AppCompatActivity() {
@@ -47,22 +48,53 @@ class MainActivity : AppCompatActivity() {
             val name = nameInput.text.toString()
             val height = heightInput.text.toString().toInt()
             val weight = weightInput.text.toString().toInt()
-            val bmi = weight / (height / 100.0).pow(2.0)
+            var bmi = weight / (height / 100.0).pow(2.0)
+            val formattedBMI = BigDecimal(bmi).setScale(2, BigDecimal.ROUND_HALF_UP).toDouble()
+            bmi = formattedBMI
+
+
             val user = User(name = name, height = height, weight = weight, bmi = bmi)
 
             lifecycleScope.launch {
                 userDao.insertUser(user)
                 showToast("新增成功")
             }
-            findButton.setOnClickListener {
-                lifecycleScope.launch {
-                    val users = userDao.getAllUsers()
-                    val result = users.joinToString("\n") { "${it.name} ${it.height} ${it.weight} ${it.bmi}" }
-                    TVresult.text = result
-                    showToast("查詢成功")
-                }
+
+
+
+
+        }
+        findButton.setOnClickListener {
+            lifecycleScope.launch {
+                val users = userDao.getAllUsers()
+                val result = users.joinToString("\n") { "${it.name} ${it.height} ${it.weight} ${it.bmi}" }
+                TVresult.text = result
+                showToast("查詢成功")
             }
         }
+        delButton.setOnClickListener {
+            val name = nameInput.text.toString()
+            lifecycleScope.launch {
+                userDao.deleteUser(name)
+                showToast("刪除成功")
+            }
+        }
+
+        modButton.setOnClickListener {
+            val name = nameInput.text.toString()
+            val height = heightInput.text.toString().toInt()
+            val weight = weightInput.text.toString().toInt()
+            var bmi = weight / (height / 100.0).pow(2.0)
+            val formattedBMI = BigDecimal(bmi).setScale(2, BigDecimal.ROUND_HALF_UP).toDouble()
+            bmi = formattedBMI
+
+
+            lifecycleScope.launch {
+                userDao.updateUser(name, height, weight, bmi)
+                showToast("修改成功")
+            }
+        }
+
 
 
 

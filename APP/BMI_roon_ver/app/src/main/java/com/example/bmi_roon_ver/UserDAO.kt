@@ -11,11 +11,11 @@ interface UserDao {
     @Insert
     suspend fun insertUser(user: User)
 
-    @Update
-    suspend fun updateUser(user: User)
+    @Query("UPDATE users SET height = :height, weight = :weight, bmi = :bmi WHERE name = :name")
+    suspend fun updateUser(name: String, height: Int, weight: Int, bmi: Double)
 
-    @Delete
-    suspend fun deleteUser(user: User)
+    @Query("DELETE FROM users WHERE name = :name")
+    suspend fun deleteUser(name: String)
 
     @Query("SELECT * FROM users WHERE name = :name")
     suspend fun getUserByName(name: String): User?
