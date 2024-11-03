@@ -1,7 +1,6 @@
 package com.example.midhomeworkaccounting
 
 import android.content.Intent
-import android.icu.text.AlphabeticIndex
 import android.os.Bundle
 import android.widget.Button
 import android.widget.CalendarView
@@ -32,11 +31,12 @@ class MainActivity2 : AppCompatActivity() {
         database = AppDatabase.getDatabase(this)
         recordDao = database.recordDao()
 
-        val btn_add = findViewById<Button>(R.id.btn_add)
+        val btn_add = findViewById<Button>(R.id.btn_del)
         val ET_name = findViewById<EditText>(R.id.ET_name)
         val ET_money = findViewById<EditText>(R.id.ET_money)
         val SW_income = findViewById<Switch>(R.id.SW_income)
         val calendarView = findViewById<CalendarView>(R.id.calendarView)
+
 
         btn_add.setOnClickListener {
             val name = ET_name.text.toString()
@@ -48,10 +48,9 @@ class MainActivity2 : AppCompatActivity() {
                 recordDao.insert(record)
                 showToast("新增成功")
             }
-            val intent = Intent("com.example.midhomeworkaccounting.UPDATE_RV")
-            sendBroadcast(intent)
 
-
+            val resultIntent = Intent()
+            setResult(RESULT_OK, resultIntent)
             finish()
         }
     }

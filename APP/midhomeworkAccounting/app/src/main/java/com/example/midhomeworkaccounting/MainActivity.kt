@@ -1,12 +1,12 @@
 package com.example.midhomeworkaccounting
 
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.Button
-import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
 
@@ -21,10 +22,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var database: AppDatabase
     private lateinit var recordDao: RecordDao
 
+    private val items: ArrayList<String> = ArrayList()
+    private lateinit var adapter: ArrayAdapter<String>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -34,40 +39,82 @@ class MainActivity : AppCompatActivity() {
         database = AppDatabase.getDatabase(this)
         recordDao = database.recordDao()
 
-        val btn_add = findViewById<Button>(R.id.btn_add)
-        val btn_add2 = findViewById<Button>(R.id.btn_add2)
+        // 初始化 RecyclerView 和 Adapter
         val rv_result = findViewById<RecyclerView>(R.id.RV_result)
-        val tv_money = findViewById<TextView>(R.id.TV_money)
-        //當MainActivity2關閉後，更新rv_result
+        val adapter = RecordAdapter(items)
+        rv_result.adapter = adapter
+        rv_result.layoutManager = LinearLayoutManager(this)
 
-        val intentFilter = IntentFilter().apply {
-            addAction("com.example.midhomeworkaccounting.UPDATE_RV")
-        }
-
-
-
-
-
-
-
-
-
-
-
+        val btn_add = findViewById<Button>(R.id.btn_del)
+        // 加載資料並顯示
+        loadData()
 
         btn_add.setOnClickListener {
             val intent = Intent(this, MainActivity2::class.java)
-            startActivity(intent)
+            startActivityForResult(intent, 1)
         }
-        btn_add2.setOnClickListener {
+    }
+
+    //當MainActivity2關閉後，更新rv_result
+    override  fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+
+        val tv_money = findViewById<TextView>(R.id.TV_money)
+        val rv_result = findViewById<RecyclerView>(R.id.RV_result)
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            loadData()
+        }
+    }
+    private fun loadData() {
+        val tv_money = findViewById<TextView>(R.id.TV_money)
+        val rv_result = findViewById<RecyclerView>(R.id.RV_result)
         lifecycleScope.launch {
+            items.clear()
+            val c = recordDao.getCount()
+            showToast("總共 $c 筆資料")
             val records = recordDao.getAll()
-            val result = records.joinToString("\n") {"${it.name} ${it.money}"}
-            tv_money.text = result
-        }}
+            records.forEach {
+                items.add("${it.name} ${it.money}")
+            }
+
+            var total = 0
+            records.forEach {
+                if (it.isIncome) {
+                    total += it.money
+                } else {
+                    total -= it.money
+                }
+            }
+            tv_money.text = total.toString()
+
+            // 通知 Adapter 資料變更
+            rv_result.adapter?.notifyDataSetChanged()
+        }
     }
     private fun showToast(text: String) {
         Toast.makeText(this, text, Toast.LENGTH_LONG).show()
     }
 
 }
+
+
+class RecordAdapter(private val items: List<String>) : RecyclerView.Adapter<RecordAdapter.RecordViewHolder>() {
+
+    inner class RecordViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val textView: TextView = itemView.findViewById(R.id.text_view_record)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecordViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_record, parent, false)
+        return RecordViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: RecordViewHolder, position: Int) {
+        holder.textView.text = items[position]
+    }
+
+    override fun getItemCount(): Int {
+        return items.size
+    }
+}
+

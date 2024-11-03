@@ -34,8 +34,8 @@ class MainActivity : AppCompatActivity() {
         }
         //data base
         dbrw = MyDBHelp.MyDBHelper(this, "myDB", 1).writableDatabase
-        adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, items)
-        findViewById<ListView>(R.id.LV_bmi).adapter = adapter
+            adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, items)
+            findViewById<ListView>(R.id.LV_bmi).adapter = adapter
 
 
 
