@@ -1,8 +1,10 @@
 package com.example.midhomeworkaccounting
 
+import android.app.DatePickerDialog
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Parcel
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -13,13 +15,16 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.MaterialDatePicker
 import kotlinx.coroutines.launch
+import java.util.Calendar
+import java.util.TimeZone
 
 class MainActivity : AppCompatActivity() {
     private lateinit var database: AppDatabase
@@ -50,7 +55,11 @@ class MainActivity : AppCompatActivity() {
         rv_result.adapter = adapter
         rv_result.layoutManager = LinearLayoutManager(this)
 
+        val btn_month = findViewById<Button>(R.id.btn_month)
         val btn_add = findViewById<Button>(R.id.btn_del)
+
+
+
         // 加載資料並顯示
         loadData()
 
@@ -60,12 +69,12 @@ class MainActivity : AppCompatActivity() {
             startActivityForResult(intent, 1)
         }
 
-
-
-
+        btn_month.setOnClickListener {
+            showMonthPicker()
+        }
     }
 
-    //當MainActivity2關閉後，更新rv_result
+    //當MainActivity2,3關閉後，更新rv_result
     override  fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         Log.d("MainActivity", "onActivityResult called: requestCode=$requestCode, resultCode=$resultCode")
@@ -101,6 +110,42 @@ class MainActivity : AppCompatActivity() {
     private fun showToast(text: String) {
         Toast.makeText(this, text, Toast.LENGTH_LONG).show()
     }
+
+    private fun showMonthPicker(){
+        val builder = MaterialDatePicker.Builder.datePicker()
+        builder.setTitleText("選擇月份")
+        builder.setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+
+        val datePicker = builder.build()
+
+        datePicker.addOnPositiveButtonClickListener { selection ->
+            val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+            calendar.timeInMillis = selection ?: 0L
+            val selectedYear = calendar.get(Calendar.YEAR)
+            val selectedMonth = calendar.get(Calendar.MONTH) + 1 // 月份從0開始，所以加1
+
+            val btn_month = findViewById<Button>(R.id.btn_month)
+            btn_month.text = "$selectedYear/$selectedMonth"
+
+            // 根據選擇的月份和年份進行資料過濾
+        }
+
+        datePicker.show(supportFragmentManager, "MonthPicker")
+
+    }
+//    private fun showMonthPicker2(){
+//        val calendar = Calendar.getInstance()
+//        val year = calendar.get(Calendar.YEAR)
+//        val month = calendar.get(Calendar.MONTH)
+//
+//        val datePickerDialog = DatePickerDialog(this, { _, selectedYear, selectedMonth, _ ->
+//            val btn_month = findViewById<Button>(R.id.btn_month)
+//            btn_month.text = "$selectedYear/$selectedMonth"
+//        }, year, month, 0
+//        )
+//    }
+
+
 
 }
 
@@ -145,6 +190,4 @@ class RecordAdapter(private val items: List<Record>) : RecyclerView.Adapter<Reco
         return items.size
     }
 
-
 }
-

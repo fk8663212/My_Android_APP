@@ -45,6 +45,14 @@ dependencies {
     kapt("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
     //
+    implementation ("com.google.android.material:material:1.8.0")  // 確保版本最新
+
+    // https://mvnrepository.com/artifact/com.whiteelephant/monthandyearpicker
+    //implementation("com.whiteelephant:monthandyearpicker:1.3.0")
+
+
+
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
