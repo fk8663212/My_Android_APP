@@ -44,6 +44,7 @@ class MainActivity2 : AppCompatActivity() {
             val isIncome = SW_income.isChecked
             val date = calendarView.date.toString()
             val record = Record(name = name, money = money, isIncome = isIncome, date = date)
+
             lifecycleScope.launch {
                 recordDao.insert(record)
                 showToast("新增成功")

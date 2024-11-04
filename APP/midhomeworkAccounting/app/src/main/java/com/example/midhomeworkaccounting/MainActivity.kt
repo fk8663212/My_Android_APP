@@ -1,6 +1,7 @@
 package com.example.midhomeworkaccounting
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -22,7 +23,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var database: AppDatabase
     private lateinit var recordDao: RecordDao
 
-    private val items: ArrayList<String> = ArrayList()
+    private val items: ArrayList<Record> = ArrayList()
     private lateinit var adapter: ArrayAdapter<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,6 +42,7 @@ class MainActivity : AppCompatActivity() {
 
         // 初始化 RecyclerView 和 Adapter
         val rv_result = findViewById<RecyclerView>(R.id.RV_result)
+
         val adapter = RecordAdapter(items)
         rv_result.adapter = adapter
         rv_result.layoutManager = LinearLayoutManager(this)
@@ -53,6 +55,10 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, MainActivity2::class.java)
             startActivityForResult(intent, 1)
         }
+
+
+
+
     }
 
     //當MainActivity2關閉後，更新rv_result
@@ -73,9 +79,7 @@ class MainActivity : AppCompatActivity() {
             val c = recordDao.getCount()
             showToast("總共 $c 筆資料")
             val records = recordDao.getAll()
-            records.forEach {
-                items.add("${it.name} ${it.money}")
-            }
+            items.addAll(records)
 
             var total = 0
             records.forEach {
@@ -98,10 +102,11 @@ class MainActivity : AppCompatActivity() {
 }
 
 
-class RecordAdapter(private val items: List<String>) : RecyclerView.Adapter<RecordAdapter.RecordViewHolder>() {
+class RecordAdapter(private val items: List<Record>) : RecyclerView.Adapter<RecordAdapter.RecordViewHolder>() {
 
     inner class RecordViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val textView: TextView = itemView.findViewById(R.id.text_view_record)
+        val textView: TextView = itemView.findViewById(R.id.tv_description)
+        val textView2: TextView = itemView.findViewById(R.id.tv_amount)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecordViewHolder {
@@ -110,7 +115,18 @@ class RecordAdapter(private val items: List<String>) : RecyclerView.Adapter<Reco
     }
 
     override fun onBindViewHolder(holder: RecordViewHolder, position: Int) {
-        holder.textView.text = items[position]
+        val record = items[position]
+        holder.textView.text = record.name
+        holder.textView2.text = record.money.toString()
+
+        if (record.isIncome){
+            holder.textView2.text = "+"+record.money.toString()
+            holder.textView2.setTextColor(Color.GREEN)
+        }
+        else{
+            holder.textView2.text = "-"+record.money.toString()
+            holder.textView2.setTextColor(Color.RED)
+        }
     }
 
     override fun getItemCount(): Int {
