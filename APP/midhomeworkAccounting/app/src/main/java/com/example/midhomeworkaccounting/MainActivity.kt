@@ -3,6 +3,7 @@ package com.example.midhomeworkaccounting
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
@@ -22,6 +24,7 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
     private lateinit var database: AppDatabase
     private lateinit var recordDao: RecordDao
+
 
     private val items: ArrayList<Record> = ArrayList()
     private lateinit var adapter: ArrayAdapter<String>
@@ -51,6 +54,7 @@ class MainActivity : AppCompatActivity() {
         // 加載資料並顯示
         loadData()
 
+        // 點擊 btn_add 的監聽器
         btn_add.setOnClickListener {
             val intent = Intent(this, MainActivity2::class.java)
             startActivityForResult(intent, 1)
@@ -63,12 +67,11 @@ class MainActivity : AppCompatActivity() {
 
     //當MainActivity2關閉後，更新rv_result
     override  fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-
-        val tv_money = findViewById<TextView>(R.id.TV_money)
-        val rv_result = findViewById<RecyclerView>(R.id.RV_result)
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 1 && resultCode == RESULT_OK) {
-            loadData()
+        Log.d("MainActivity", "onActivityResult called: requestCode=$requestCode, resultCode=$resultCode")
+        if (requestCode == 1 || requestCode == 2) {
+            if(resultCode == RESULT_OK)
+                loadData()
         }
     }
     private fun loadData() {
@@ -127,10 +130,21 @@ class RecordAdapter(private val items: List<Record>) : RecyclerView.Adapter<Reco
             holder.textView2.text = "-"+record.money.toString()
             holder.textView2.setTextColor(Color.RED)
         }
+        //點擊事件切換至另一個activity3
+        //傳送資料位置，以便在activity3進行刪除修改
+        holder.itemView.setOnClickListener {
+            val intent = Intent(holder.itemView.context, MainActivity3::class.java)
+            intent.putExtra("position", position)
+            (holder.itemView.context as? AppCompatActivity)?.startActivityForResult(intent, 2)
+
+        }
+
     }
 
     override fun getItemCount(): Int {
         return items.size
     }
+
+
 }
 

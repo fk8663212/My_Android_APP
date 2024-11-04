@@ -17,6 +17,14 @@ interface RecordDao {
     //列出所有資料
     @Query("SELECT * FROM record")
     suspend fun getAll(): List<Record>
+    //刪除指定位置的資料
+    @Query("DELETE FROM record WHERE id = :position")
+    suspend fun delete(position: Int)
+    //修改指定位置的資料
+    @Query("UPDATE record SET name = :description, money = :amount, isIncome = :isIncome WHERE id = :position")
+    suspend fun update(position: Int, description: String, amount: Int, isIncome: Boolean)
+
+
 
 
 

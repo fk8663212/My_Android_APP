@@ -1,23 +1,29 @@
 package com.example.midhomeworkaccounting
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.CalendarView
 import android.widget.EditText
 import android.widget.Switch
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 class MainActivity3 : AppCompatActivity() {
     private lateinit var database: AppDatabase
     private lateinit var recordDao: RecordDao
+    private var record: Record? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main3)
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -34,17 +40,52 @@ class MainActivity3 : AppCompatActivity() {
         val SW_income = findViewById<Switch>(R.id.SW_income)
         val calendarView = findViewById<CalendarView>(R.id.calendarView)
 
+        val position = intent.getIntExtra("position", -1)
 
-        btn_del.setOnClickListener {
-            val name = ET_name.text.toString()
-            val money = ET_money.text.toString().toInt()
-            val isIncome = SW_income.isChecked
-            val date = calendarView.date.toString()
-            val record = Record(name = name, money = money, isIncome = isIncome, date = date)
-            finish()
-
+        // 獲取記錄
+        if (position != -1) {
+            loadRecord(position)
         }
 
+        btn_del.setOnClickListener {
+            record?.let {
+                lifecycleScope.launch {
+                    recordDao.delete(it.id)  // 直接刪除記錄物件
+                    showToast("刪除成功")
+                    setResult(RESULT_OK, intent)  // 通知 MainActivity 更新
+                    Log.d("MainActivity3", "Deleted record: ${it.name}")
+                    finish()
 
+                }
+            }
+        }
+
+        btn_mod.setOnClickListener {
+            record?.let {
+                lifecycleScope.launch {
+                    // 更新記錄
+                    recordDao.update(it.id, ET_name.text.toString(), ET_money.text.toString().toInt(), SW_income.isChecked)
+                    setResult(RESULT_OK, intent)  // 通知 MainActivity 更新
+                    Log.d("MainActivity3", "Updated record: ${it.name}")
+                    finish()
+                }
+            }
+        }
+    }
+
+    private fun loadRecord(position: Int) {
+        lifecycleScope.launch {
+            // 獲取並顯示記錄
+            record = recordDao.getAll()[position]
+            record?.let {
+                findViewById<EditText>(R.id.ET_name).setText(it.name)
+                findViewById<EditText>(R.id.ET_money).setText(it.money.toString())
+                findViewById<Switch>(R.id.SW_income).isChecked = it.isIncome
+                // 這裡可以根據需求設定 CalendarView 的日期
+            }
+        }
+    }
+    private fun showToast(text: String) {
+        Toast.makeText(this, text, Toast.LENGTH_LONG).show()
     }
 }
