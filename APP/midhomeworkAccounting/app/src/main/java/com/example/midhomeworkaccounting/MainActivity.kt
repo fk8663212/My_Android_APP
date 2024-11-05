@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.whiteelephant.monthpicker.MonthPickerDialog
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.TimeZone
@@ -70,7 +71,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         btn_month.setOnClickListener {
-            showMonthPicker()
+            showMonthPicker2()
         }
     }
 
@@ -133,16 +134,41 @@ class MainActivity : AppCompatActivity() {
         datePicker.show(supportFragmentManager, "MonthPicker")
 
     }
-//    private fun showMonthPicker2(){
+    private fun showMonthPicker2(){
+        val today = Calendar.getInstance()
+
+        MonthPickerDialog.Builder(this, { selectedMonth, selectedYear ->
+            val btnMonth = findViewById<Button>(R.id.btn_month)
+            btnMonth.text = "$selectedYear/${selectedMonth + 1}"
+            //filterDataByMonth(selectedYear, selectedMonth + 1)
+        }, today.get(Calendar.YEAR), today.get(Calendar.MONTH))
+            .setMinYear(1990)
+            .setMaxYear(2100)
+            .setTitle("選擇月份")
+            .build()
+            .show()
+
+    }
+//    private fun showMonthYearPicker() {
 //        val calendar = Calendar.getInstance()
-//        val year = calendar.get(Calendar.YEAR)
-//        val month = calendar.get(Calendar.MONTH)
-//
-//        val datePickerDialog = DatePickerDialog(this, { _, selectedYear, selectedMonth, _ ->
-//            val btn_month = findViewById<Button>(R.id.btn_month)
-//            btn_month.text = "$selectedYear/$selectedMonth"
-//        }, year, month, 0
+//        val datePickerDialog = DatePickerDialog(
+//            this,
+//            { _, year, month, _ ->
+//                val btnMonth = findViewById<Button>(R.id.btn_month)
+//                btnMonth.text = "$year/${month + 1}"
+//                //filterDataByMonth(year, month + 1)
+//            },
+//            calendar.get(Calendar.YEAR),
+//            calendar.get(Calendar.MONTH),
+//            calendar.get(Calendar.DAY_OF_MONTH)
 //        )
+//
+//        // 隱藏日期選擇部分
+//        datePickerDialog.datePicker.findViewById<View>(
+//            resources.getIdentifier("android:id/day", null, null)
+//        )?.visibility = View.GONE
+//
+//        datePickerDialog.show()
 //    }
 
 
@@ -164,7 +190,7 @@ class RecordAdapter(private val items: List<Record>) : RecyclerView.Adapter<Reco
 
     override fun onBindViewHolder(holder: RecordViewHolder, position: Int) {
         val record = items[position]
-        holder.textView.text = record.name
+        holder.textView.text = record.date
         holder.textView2.text = record.money.toString()
 
         if (record.isIncome){
