@@ -36,14 +36,29 @@ class MainActivity2 : AppCompatActivity() {
         val ET_money = findViewById<EditText>(R.id.ET_money)
         val SW_income = findViewById<Switch>(R.id.SW_income)
         val calendarView = findViewById<CalendarView>(R.id.calendarView)
+        var date =""
+        var cyear = 0
+        var cmonth = 0
+        var cday = 0
+
+        calendarView.setOnDateChangeListener { view, year, month, dayOfMonth ->
+            date = "$year/${month + 1}/$dayOfMonth"
+            showToast(date)
+            cyear = year
+            cmonth = month+1
+            cday = dayOfMonth
+            showToast(date)
+
+        }
 
 
         btn_add.setOnClickListener {
             val name = ET_name.text.toString()
             val money = ET_money.text.toString().toInt()
             val isIncome = SW_income.isChecked
-            val date = calendarView.date.toString()
-            val record = Record(name = name, money = money, isIncome = isIncome, date = date)
+
+
+            val record = Record(name = name, money = money, isIncome = isIncome,year = cyear,month = cmonth,day = cday)
 
             lifecycleScope.launch {
                 recordDao.insert(record)

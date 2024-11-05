@@ -39,6 +39,20 @@ class MainActivity3 : AppCompatActivity() {
         val ET_money = findViewById<EditText>(R.id.ET_money)
         val SW_income = findViewById<Switch>(R.id.SW_income)
         val calendarView = findViewById<CalendarView>(R.id.calendarView)
+        var date =""
+        var cyear = 0
+        var cmonth = 0
+        var cday = 0
+
+        calendarView.setOnDateChangeListener { view, year, month, dayOfMonth ->
+            date = "$year/${month + 1}/$dayOfMonth"
+            showToast(date)
+            cyear = year
+            cmonth = month
+            cday = dayOfMonth
+
+        }
+
 
         val position = intent.getIntExtra("position", -1)
 
@@ -64,7 +78,7 @@ class MainActivity3 : AppCompatActivity() {
             record?.let {
                 lifecycleScope.launch {
                     // 更新記錄
-                    recordDao.update(it.id, ET_name.text.toString(), ET_money.text.toString().toInt(), SW_income.isChecked)
+                    recordDao.update(it.id, ET_name.text.toString(), ET_money.text.toString().toInt(),cyear,cmonth,cday, SW_income.isChecked)
                     setResult(RESULT_OK, intent)  // 通知 MainActivity 更新
                     Log.d("MainActivity3", "Updated record: ${it.name}")
                     finish()

@@ -21,8 +21,16 @@ interface RecordDao {
     @Query("DELETE FROM record WHERE id = :position")
     suspend fun delete(position: Int)
     //修改指定位置的資料
-    @Query("UPDATE record SET name = :description, money = :amount, isIncome = :isIncome WHERE id = :position")
-    suspend fun update(position: Int, description: String, amount: Int, isIncome: Boolean)
+    @Query("UPDATE record SET name = :description, money = :amount,year = :year, month = :month, day = :day, isIncome = :isIncome WHERE id = :position ")
+    suspend fun update(position: Int, description: String, amount: Int, year: Int, month: Int, day: Int, isIncome: Boolean)
+    //查詢指定月份的資料
+    @Query("SELECT * FROM record WHERE year = :year AND month = :month")
+    suspend fun getRecordsByMonth(year: Int, month: Int): List<Record>
+
+
+
+
+
 
 
 

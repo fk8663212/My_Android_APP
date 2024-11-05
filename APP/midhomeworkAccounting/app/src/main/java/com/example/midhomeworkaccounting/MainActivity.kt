@@ -71,7 +71,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         btn_month.setOnClickListener {
-            showMonthPicker2()
+            showMonthPicker()
         }
     }
 
@@ -112,35 +112,14 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, text, Toast.LENGTH_LONG).show()
     }
 
+
     private fun showMonthPicker(){
-        val builder = MaterialDatePicker.Builder.datePicker()
-        builder.setTitleText("選擇月份")
-        builder.setSelection(MaterialDatePicker.todayInUtcMilliseconds())
-
-        val datePicker = builder.build()
-
-        datePicker.addOnPositiveButtonClickListener { selection ->
-            val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-            calendar.timeInMillis = selection ?: 0L
-            val selectedYear = calendar.get(Calendar.YEAR)
-            val selectedMonth = calendar.get(Calendar.MONTH) + 1 // 月份從0開始，所以加1
-
-            val btn_month = findViewById<Button>(R.id.btn_month)
-            btn_month.text = "$selectedYear/$selectedMonth"
-
-            // 根據選擇的月份和年份進行資料過濾
-        }
-
-        datePicker.show(supportFragmentManager, "MonthPicker")
-
-    }
-    private fun showMonthPicker2(){
         val today = Calendar.getInstance()
 
         MonthPickerDialog.Builder(this, { selectedMonth, selectedYear ->
             val btnMonth = findViewById<Button>(R.id.btn_month)
             btnMonth.text = "$selectedYear/${selectedMonth + 1}"
-            //filterDataByMonth(selectedYear, selectedMonth + 1)
+            filterDataByMonth(selectedYear, selectedMonth + 1)
         }, today.get(Calendar.YEAR), today.get(Calendar.MONTH))
             .setMinYear(1990)
             .setMaxYear(2100)
@@ -149,28 +128,15 @@ class MainActivity : AppCompatActivity() {
             .show()
 
     }
-//    private fun showMonthYearPicker() {
-//        val calendar = Calendar.getInstance()
-//        val datePickerDialog = DatePickerDialog(
-//            this,
-//            { _, year, month, _ ->
-//                val btnMonth = findViewById<Button>(R.id.btn_month)
-//                btnMonth.text = "$year/${month + 1}"
-//                //filterDataByMonth(year, month + 1)
-//            },
-//            calendar.get(Calendar.YEAR),
-//            calendar.get(Calendar.MONTH),
-//            calendar.get(Calendar.DAY_OF_MONTH)
-//        )
-//
-//        // 隱藏日期選擇部分
-//        datePickerDialog.datePicker.findViewById<View>(
-//            resources.getIdentifier("android:id/day", null, null)
-//        )?.visibility = View.GONE
-//
-//        datePickerDialog.show()
-//    }
-
+    private fun filterDataByMonth(year: Int, month: Int) {
+        val rv_result = findViewById<RecyclerView>(R.id.RV_result)
+        lifecycleScope.launch {
+            items.clear()
+            val filteredRecords = recordDao.getRecordsByMonth(year, month)
+            items.addAll(filteredRecords)
+            rv_result.adapter?.notifyDataSetChanged()
+        }
+    }
 
 
 }
@@ -190,7 +156,7 @@ class RecordAdapter(private val items: List<Record>) : RecyclerView.Adapter<Reco
 
     override fun onBindViewHolder(holder: RecordViewHolder, position: Int) {
         val record = items[position]
-        holder.textView.text = record.date
+        holder.textView.text = "${record.year}/${record.month}/${record.day}"
         holder.textView2.text = record.money.toString()
 
         if (record.isIncome){
