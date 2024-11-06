@@ -1,6 +1,7 @@
 package com.example.midhomeworkaccounting.RecyclerView
 
 import android.graphics.Color
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,8 +19,14 @@ class MixedAdapter(private val items: List<Any>) : RecyclerView.Adapter<Recycler
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (items[position] is DateHeader) VIEW_TYPE_DATE_HEADER else VIEW_TYPE_RECORD
+        val item = items[position]
+        return when (item) {
+            is DateHeader -> VIEW_TYPE_DATE_HEADER
+            is TransactionRecord -> VIEW_TYPE_RECORD
+            else -> throw IllegalArgumentException("不支援的項目類型")
+        }
     }
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return if (viewType == VIEW_TYPE_DATE_HEADER) {
@@ -32,21 +39,22 @@ class MixedAdapter(private val items: List<Any>) : RecyclerView.Adapter<Recycler
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (holder is DateHeaderViewHolder) {
-            val dateHeader = items[position] as DateHeader
-            holder.tvDate.text = dateHeader.date
-            holder.tvTotalAmount.text = "$${dateHeader.totalAmount}"
-            holder.tvTotalAmount.setTextColor(if (dateHeader.totalAmount >= 0) Color.BLUE else Color.RED)
-        } else if (holder is RecordViewHolder) {
-            val record = items[position] as TransactionRecord
-            holder.tvDescription.text = record.description
-            holder.tvAmount.text = if (record.isIncome) "+$${record.amount}" else "-$${record.amount}"
-            holder.tvAmount.setTextColor(if (record.isIncome) Color.BLUE else Color.RED)
-        }
-        else{
-            val record = items[position] as TransactionRecord
+        val item = items[position]
+        if (holder is DateHeaderViewHolder && item is DateHeader) {
+//            holder.tvDate.text = item.
+//            holder.tvTotalAmount.text = "$${item.totalAmount}"
+//            holder.tvTotalAmount.setTextColor(if (item.totalAmount >= 0) Color.BLUE else Color.RED)
+        } else if (holder is RecordViewHolder && item is TransactionRecord) {
+            holder.tvDescription.text = item.description
+            holder.tvAmount.text = if (item.isIncome) "+$${item.amount}" else "-$${item.amount}"
+            holder.tvAmount.setTextColor(if (item.isIncome) Color.BLUE else Color.RED)
+        } else {
+            // 調試代碼，顯示不支援的項目類型
+            Log.e("MixedAdapter", "不支援的項目類型: ${item::class.java.simpleName} at position $position")
+            throw IllegalArgumentException("在位置 $position 的項目類型不支援")
         }
     }
+
 
     override fun getItemCount(): Int = items.size
 

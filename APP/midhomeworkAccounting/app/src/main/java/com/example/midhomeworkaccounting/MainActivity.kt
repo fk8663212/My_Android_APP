@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         // 初始化 RecyclerView 和 Adapter
         val rv_result = findViewById<RecyclerView>(R.id.RV_result)
 
-        val adapter = MixedAdapter(items)
+        val adapter = RecordAdapter(items)
         rv_result.adapter = adapter
         rv_result.layoutManager = LinearLayoutManager(this)
 
@@ -134,7 +134,6 @@ class MainActivity : AppCompatActivity() {
             .setTitle("選擇月份")
             .build()
             .show()
-
     }
     private fun filterDataByMonth(year: Int, month: Int) {
         lifecycleScope.launch {
@@ -182,7 +181,8 @@ class RecordAdapter(private val items: List<Record>) : RecyclerView.Adapter<Reco
 
     override fun onBindViewHolder(holder: RecordViewHolder, position: Int) {
         val record = items[position]
-        holder.textView.text = "${record.year}/${record.month}/${record.day}"
+        //holder.textView.text = "${record.year}/${record.month}/${record.day}"
+        holder.textView.text = record.name
         holder.textView2.text = record.money.toString()
 
         if (record.isIncome){

@@ -19,7 +19,6 @@ class MainActivity2 : AppCompatActivity() {
     private lateinit var database: AppDatabase
     private lateinit var recordDao: RecordDao
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main2)
@@ -39,17 +38,16 @@ class MainActivity2 : AppCompatActivity() {
         val calendarView = findViewById<CalendarView>(R.id.calendarView)
         var date =""
         var cyear = Calendar.getInstance().get(Calendar.YEAR)
-        var cmonth = Calendar.getInstance().get(Calendar.MONTH)
+        var cmonth = Calendar.getInstance().get(Calendar.MONTH)+1
         var cday = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
+        showToast("$cyear/${cmonth}/$cday")
 
         calendarView.setOnDateChangeListener { view, year, month, dayOfMonth ->
-            date = "$year/${month + 1}/$dayOfMonth"
-            showToast(date)
             cyear = year
             cmonth = month+1
             cday = dayOfMonth
+            date = "$cyear/${cmonth}/$cday"
             showToast(date)
-
         }
 
 

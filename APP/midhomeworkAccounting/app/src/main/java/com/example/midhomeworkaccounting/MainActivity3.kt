@@ -46,11 +46,11 @@ class MainActivity3 : AppCompatActivity() {
         var cday = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
 
         calendarView.setOnDateChangeListener { view, year, month, dayOfMonth ->
-            date = "$year/${month + 1}/$dayOfMonth"
-            showToast(date)
             cyear = year
-            cmonth = month
+            cmonth = month+1
             cday = dayOfMonth
+            date = "$cyear/${cmonth}/$cday"
+            showToast(date)
 
         }
 
