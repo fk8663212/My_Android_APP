@@ -117,7 +117,7 @@ class MainActivity : AppCompatActivity() {
                     items.add(ListItem.DateHeader(currentDate, dailyTotal.toString()))
                 }
                 // 加入 TransactionItem
-                items.add(ListItem.TransactionItem(record.name, record.money.toString(), record.isIncome))
+                items.add(ListItem.TransactionItem(record.id,record.name, record.money.toString(), record.isIncome))
 
                 // 計算總收入/支出
                 totalAmount += if (record.isIncome) record.money else -record.money
@@ -176,7 +176,7 @@ class MainActivity : AppCompatActivity() {
                     groupedItems.add(ListItem.DateHeader(currentDate, dailyTotal.toString()))
                 }
                 // 加入 TransactionItem
-                groupedItems.add(ListItem.TransactionItem(record.name, record.money.toString(), record.isIncome))
+                groupedItems.add(ListItem.TransactionItem(record.id,record.name, record.money.toString(), record.isIncome))
 
                 // 計算當月總收入/支出
                 totalAmount += if (record.isIncome) record.money else -record.money

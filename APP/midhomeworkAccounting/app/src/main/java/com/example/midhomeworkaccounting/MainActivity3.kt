@@ -55,11 +55,9 @@ class MainActivity3 : AppCompatActivity() {
         }
 
 
-        val position = intent.getIntExtra("position", -1)
-
-        // 獲取記錄
-        if (position != -1) {
-            loadRecord(position)
+        val recordId = intent.getIntExtra("record_id", -1) // 获取record_id
+        if (recordId != -1) {
+            loadRecord(recordId)
         }
 
         btn_del.setOnClickListener {
@@ -88,15 +86,15 @@ class MainActivity3 : AppCompatActivity() {
         }
     }
 
-    private fun loadRecord(position: Int) {
+    private fun loadRecord(recordId: Int) {
         lifecycleScope.launch {
-            // 獲取並顯示記錄
-            record = recordDao.getAll()[position]
+            // 通过ID而非position查询数据库
+            record = recordDao.getRecordById(recordId)
             record?.let {
                 findViewById<EditText>(R.id.ET_name).setText(it.name)
                 findViewById<EditText>(R.id.ET_money).setText(it.money.toString())
                 findViewById<Switch>(R.id.SW_income).isChecked = it.isIncome
-                // 這裡可以根據需求設定 CalendarView 的日期
+                // 可以设置 CalendarView 的日期
             }
         }
     }

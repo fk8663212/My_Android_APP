@@ -88,7 +88,7 @@ class TransactionAdapter(private val items: List<ListItem>) : RecyclerView.Adapt
             //傳送資料位置，以便在activity3進行刪除修改
             itemView.setOnClickListener {
                 val intent = Intent(itemView.context, MainActivity3::class.java)
-                intent.putExtra("position", position)
+                intent.putExtra("record_id", item.recordId) // 传递record ID
                 (itemView.context as? AppCompatActivity)?.startActivityForResult(intent, 2)
             }
         }

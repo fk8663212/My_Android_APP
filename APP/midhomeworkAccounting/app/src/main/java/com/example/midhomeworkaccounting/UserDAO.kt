@@ -27,6 +27,10 @@ interface RecordDao {
     @Query("SELECT * FROM record WHERE year = :year AND month = :month")
     suspend fun getByMonth(year: Int, month: Int): List<Record>
 
+    @Query("SELECT * FROM record WHERE id = :recordId")
+    suspend fun getRecordById(recordId: Int): Record
+
+
 
 
 
