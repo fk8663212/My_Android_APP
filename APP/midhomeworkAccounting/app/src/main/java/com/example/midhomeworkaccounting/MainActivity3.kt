@@ -13,6 +13,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
+import java.util.Calendar
 
 class MainActivity3 : AppCompatActivity() {
     private lateinit var database: AppDatabase
@@ -40,9 +41,9 @@ class MainActivity3 : AppCompatActivity() {
         val SW_income = findViewById<Switch>(R.id.SW_income)
         val calendarView = findViewById<CalendarView>(R.id.calendarView)
         var date =""
-        var cyear = 0
-        var cmonth = 0
-        var cday = 0
+        var cyear = Calendar.getInstance().get(Calendar.YEAR)
+        var cmonth = Calendar.getInstance().get(Calendar.MONTH)
+        var cday = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
 
         calendarView.setOnDateChangeListener { view, year, month, dayOfMonth ->
             date = "$year/${month + 1}/$dayOfMonth"

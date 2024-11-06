@@ -60,6 +60,11 @@ class MainActivity : AppCompatActivity() {
         val btn_add = findViewById<Button>(R.id.btn_del)
 
 
+//        val today=Calendar.getInstance()
+//        btn_month.text="${today.get(Calendar.YEAR)}/${today.get(Calendar.MONTH)+1}"
+
+
+
 
         // 加載資料並顯示
         loadData()
@@ -91,7 +96,9 @@ class MainActivity : AppCompatActivity() {
             items.clear()
             val c = recordDao.getCount()
             showToast("總共 $c 筆資料")
-            val records = recordDao.getAll()
+            val records = recordDao.getAll().sortedWith(compareByDescending<Record> { it.year }
+            .thenByDescending { it.month }
+            .thenByDescending { it.day })
             items.addAll(records)
 
             var total = 0
@@ -115,7 +122,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun showMonthPicker(){
         val today = Calendar.getInstance()
-
         MonthPickerDialog.Builder(this, { selectedMonth, selectedYear ->
             val btnMonth = findViewById<Button>(R.id.btn_month)
             btnMonth.text = "$selectedYear/${selectedMonth + 1}"
@@ -129,12 +135,30 @@ class MainActivity : AppCompatActivity() {
 
     }
     private fun filterDataByMonth(year: Int, month: Int) {
-        val rv_result = findViewById<RecyclerView>(R.id.RV_result)
         lifecycleScope.launch {
             items.clear()
-            val filteredRecords = recordDao.getRecordsByMonth(year, month)
+
+            // 從資料庫取得符合條件的資料並進行排序
+            val filteredRecords = recordDao.getByMonth(year, month)
+                .sortedWith(compareByDescending<Record> { it.year }
+                    .thenByDescending { it.month }
+                    .thenByDescending { it.day })
+
             items.addAll(filteredRecords)
-            rv_result.adapter?.notifyDataSetChanged()
+
+            // 計算當月總收入/支出
+            var total = 0
+            filteredRecords.forEach {
+                if (it.isIncome) {
+                    total += it.money
+                } else {
+                    total -= it.money
+                }
+            }
+            findViewById<TextView>(R.id.TV_money).text = total.toString()
+
+            // 通知 Adapter 資料變更
+            findViewById<RecyclerView>(R.id.RV_result).adapter?.notifyDataSetChanged()
         }
     }
 

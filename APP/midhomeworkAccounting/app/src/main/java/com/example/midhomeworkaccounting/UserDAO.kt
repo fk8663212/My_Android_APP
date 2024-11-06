@@ -25,7 +25,8 @@ interface RecordDao {
     suspend fun update(position: Int, description: String, amount: Int, year: Int, month: Int, day: Int, isIncome: Boolean)
     //查詢指定月份的資料
     @Query("SELECT * FROM record WHERE year = :year AND month = :month")
-    suspend fun getRecordsByMonth(year: Int, month: Int): List<Record>
+    suspend fun getByMonth(year: Int, month: Int): List<Record>
+
 
 
 
