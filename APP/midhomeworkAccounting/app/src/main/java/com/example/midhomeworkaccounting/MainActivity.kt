@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity() {
     private val items: ArrayList<ListItem> = ArrayList()
     private lateinit var adapter: ArrayAdapter<String>
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -85,10 +86,31 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         Log.d("MainActivity", "onActivityResult called: requestCode=$requestCode, resultCode=$resultCode")
         if (requestCode == 1 || requestCode == 2) {
-            if(resultCode == RESULT_OK)
-                loadData()
+            if(resultCode == RESULT_OK){
+                //loadData()
+                loadAndFilterData()
+            }
+
         }
     }
+    private fun loadAndFilterData() {
+        val btnMonth = findViewById<Button>(R.id.btn_month)
+        val selectedMonthYear = btnMonth.text.toString().split("/")
+
+        if (selectedMonthYear.size == 2) {
+            val year = selectedMonthYear[0].toIntOrNull()
+            val month = selectedMonthYear[1].toIntOrNull()
+            if (year != null && month != null) {
+                filterDataByMonth(year, month)
+                return
+            }
+        }
+
+        // 如果未選擇月份或格式錯誤，則加載所有數據
+        loadData()
+
+    }
+
     private fun loadData() {
         val tv_money = findViewById<TextView>(R.id.TV_money)
         val rv_result = findViewById<RecyclerView>(R.id.RV_result)
@@ -117,7 +139,7 @@ class MainActivity : AppCompatActivity() {
                     items.add(ListItem.DateHeader(currentDate, dailyTotal.toString()))
                 }
                 // 加入 TransactionItem
-                items.add(ListItem.TransactionItem(record.id,record.name, record.money.toString(), record.isIncome))
+                items.add(ListItem.TransactionItem(record.id,record.name, record.money.toString(), record.isIncome,record.year,record.month,record.day))
 
                 // 計算總收入/支出
                 totalAmount += if (record.isIncome) record.money else -record.money
@@ -176,7 +198,7 @@ class MainActivity : AppCompatActivity() {
                     groupedItems.add(ListItem.DateHeader(currentDate, dailyTotal.toString()))
                 }
                 // 加入 TransactionItem
-                groupedItems.add(ListItem.TransactionItem(record.id,record.name, record.money.toString(), record.isIncome))
+                groupedItems.add(ListItem.TransactionItem(record.id,record.name, record.money.toString(), record.isIncome,record.year,record.month,record.day))
 
                 // 計算當月總收入/支出
                 totalAmount += if (record.isIncome) record.money else -record.money
@@ -196,45 +218,3 @@ class MainActivity : AppCompatActivity() {
 
 }
 
-
-class RecordAdapter(private val items: List<Record>) : RecyclerView.Adapter<RecordAdapter.RecordViewHolder>() {
-
-    inner class RecordViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val textView: TextView = itemView.findViewById(R.id.tv_description)
-        val textView2: TextView = itemView.findViewById(R.id.tv_amount)
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecordViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_record, parent, false)
-        return RecordViewHolder(view)
-    }
-
-    override fun onBindViewHolder(holder: RecordViewHolder, position: Int) {
-        val record = items[position]
-        //holder.textView.text = "${record.year}/${record.month}/${record.day}"
-        holder.textView.text = record.name
-        holder.textView2.text = record.money.toString()
-
-        if (record.isIncome){
-            holder.textView2.text = "+"+record.money.toString()
-            holder.textView2.setTextColor(Color.GREEN)
-        }
-        else{
-            holder.textView2.text = "-"+record.money.toString()
-            holder.textView2.setTextColor(Color.RED)
-        }
-        //點擊事件切換至另一個activity3
-        //傳送資料位置，以便在activity3進行刪除修改
-        holder.itemView.setOnClickListener {
-            val intent = Intent(holder.itemView.context, MainActivity3::class.java)
-            intent.putExtra("position", position)
-            (holder.itemView.context as? AppCompatActivity)?.startActivityForResult(intent, 2)
-        }
-
-    }
-
-    override fun getItemCount(): Int {
-        return items.size
-    }
-
-}

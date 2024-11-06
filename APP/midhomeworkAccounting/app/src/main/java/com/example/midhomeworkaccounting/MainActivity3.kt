@@ -41,9 +41,14 @@ class MainActivity3 : AppCompatActivity() {
         val SW_income = findViewById<Switch>(R.id.SW_income)
         val calendarView = findViewById<CalendarView>(R.id.calendarView)
         var date =""
-        var cyear = Calendar.getInstance().get(Calendar.YEAR)
-        var cmonth = Calendar.getInstance().get(Calendar.MONTH)
-        var cday = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
+        var cyear = intent.getIntExtra("year", Calendar.getInstance().get(Calendar.YEAR))
+        var cmonth = intent.getIntExtra("month", Calendar.getInstance().get(Calendar.MONTH))+1
+        var cday = intent.getIntExtra("day", Calendar.getInstance().get(Calendar.DAY_OF_MONTH))
+
+        val calendar = Calendar.getInstance()
+        calendar.set(cyear, cmonth-1, cday)
+        calendarView.date = calendar.timeInMillis
+        showToast("$cyear/${cmonth}/$cday")
 
         calendarView.setOnDateChangeListener { view, year, month, dayOfMonth ->
             cyear = year

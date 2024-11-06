@@ -89,6 +89,9 @@ class TransactionAdapter(private val items: List<ListItem>) : RecyclerView.Adapt
             itemView.setOnClickListener {
                 val intent = Intent(itemView.context, MainActivity3::class.java)
                 intent.putExtra("record_id", item.recordId) // 传递record ID
+                intent.putExtra("year", item.year)
+                intent.putExtra("month", item.month -1) // Calendar month is 0-based
+                intent.putExtra("day", item.day)
                 (itemView.context as? AppCompatActivity)?.startActivityForResult(intent, 2)
             }
         }
