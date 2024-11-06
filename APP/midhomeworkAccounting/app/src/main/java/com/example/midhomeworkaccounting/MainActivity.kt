@@ -20,20 +20,20 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.midhomeworkaccounting.RecyclerView.MixedAdapter
-import com.google.android.material.datepicker.CalendarConstraints
-import com.google.android.material.datepicker.MaterialDatePicker
+import com.example.midhomeworkaccounting.RecyclerView.TransactionAdapter
+
+
 import com.whiteelephant.monthpicker.MonthPickerDialog
 import kotlinx.coroutines.launch
 import java.util.Calendar
-import java.util.TimeZone
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var database: AppDatabase
     private lateinit var recordDao: RecordDao
 
 
-    private val items: ArrayList<Record> = ArrayList()
+    private val items: ArrayList<ListItem> = ArrayList()
     private lateinit var adapter: ArrayAdapter<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,7 +53,9 @@ class MainActivity : AppCompatActivity() {
         // 初始化 RecyclerView 和 Adapter
         val rv_result = findViewById<RecyclerView>(R.id.RV_result)
 
-        val adapter = RecordAdapter(items)
+        val adapter = TransactionAdapter(items)
+        //val adapter = RecordAdapter(items)
+
         rv_result.adapter = adapter
         rv_result.layoutManager = LinearLayoutManager(this)
 
@@ -63,9 +65,6 @@ class MainActivity : AppCompatActivity() {
 
 //        val today=Calendar.getInstance()
 //        btn_month.text="${today.get(Calendar.YEAR)}/${today.get(Calendar.MONTH)+1}"
-
-
-
 
         // 加載資料並顯示
         loadData()
@@ -93,30 +92,45 @@ class MainActivity : AppCompatActivity() {
     private fun loadData() {
         val tv_money = findViewById<TextView>(R.id.TV_money)
         val rv_result = findViewById<RecyclerView>(R.id.RV_result)
-        lifecycleScope.launch {
-            items.clear()
-            val c = recordDao.getCount()
-            showToast("總共 $c 筆資料")
-            val records = recordDao.getAll().sortedWith(compareByDescending<Record> { it.year }
-            .thenByDescending { it.month }
-            .thenByDescending { it.day })
-            items.addAll(records)
 
-            var total = 0
-            records.forEach {
-                if (it.isIncome) {
-                    total += it.money
-                } else {
-                    total -= it.money
+        lifecycleScope.launch {
+            // 清空舊的資料
+            items.clear()
+
+            // 從資料庫獲取記錄，並按日期排序
+            val records = recordDao.getAll()
+                .sortedWith(compareByDescending<Record> { it.year }
+                    .thenByDescending { it.month }
+                    .thenByDescending { it.day })
+
+            var totalAmount = 0
+            var currentDate = ""
+
+            records.forEach { record ->
+                // 將日期格式化為 "年/月/日" 字串
+                val dateStr = "${record.year}/${record.month}/${record.day}"
+                if (dateStr != currentDate) {
+                    // 如果是新日期，則加入 DateHeader
+                    currentDate = dateStr
+                    val dailyTotal = records.filter { it.year == record.year && it.month == record.month && it.day == record.day }
+                        .sumOf { if (it.isIncome) it.money else -it.money }
+                    items.add(ListItem.DateHeader(currentDate, dailyTotal.toString()))
                 }
+                // 加入 TransactionItem
+                items.add(ListItem.TransactionItem(record.name, record.money.toString(), record.isIncome))
+
+                // 計算總收入/支出
+                totalAmount += if (record.isIncome) record.money else -record.money
             }
-            tv_money.text = total.toString()
+
+            // 更新總金額顯示
+            tv_money.text = totalAmount.toString()
 
             // 通知 Adapter 資料變更
             rv_result.adapter?.notifyDataSetChanged()
         }
-
     }
+
     private fun showToast(text: String) {
         Toast.makeText(this, text, Toast.LENGTH_LONG).show()
     }
@@ -137,6 +151,7 @@ class MainActivity : AppCompatActivity() {
     }
     private fun filterDataByMonth(year: Int, month: Int) {
         lifecycleScope.launch {
+            // 清空舊的資料
             items.clear()
 
             // 從資料庫取得符合條件的資料並進行排序
@@ -145,23 +160,38 @@ class MainActivity : AppCompatActivity() {
                     .thenByDescending { it.month }
                     .thenByDescending { it.day })
 
-            items.addAll(filteredRecords)
+            // 創建 ListItem 的清單
+            val groupedItems = ArrayList<ListItem>()
+            var totalAmount = 0
+            var currentDate = ""
 
-            // 計算當月總收入/支出
-            var total = 0
-            filteredRecords.forEach {
-                if (it.isIncome) {
-                    total += it.money
-                } else {
-                    total -= it.money
+            filteredRecords.forEach { record ->
+                // 將日期格式化為 "年/月/日" 字串
+                val dateStr = "${record.year}/${record.month}/${record.day}"
+                if (dateStr != currentDate) {
+                    // 如果是新日期，則加入 DateHeader
+                    currentDate = dateStr
+                    val dailyTotal = filteredRecords.filter { it.year == record.year && it.month == record.month && it.day == record.day }
+                        .sumOf { if (it.isIncome) it.money else -it.money }
+                    groupedItems.add(ListItem.DateHeader(currentDate, dailyTotal.toString()))
                 }
-            }
-            findViewById<TextView>(R.id.TV_money).text = total.toString()
+                // 加入 TransactionItem
+                groupedItems.add(ListItem.TransactionItem(record.name, record.money.toString(), record.isIncome))
 
-            // 通知 Adapter 資料變更
-            findViewById<RecyclerView>(R.id.RV_result).adapter?.notifyDataSetChanged()
+                // 計算當月總收入/支出
+                totalAmount += if (record.isIncome) record.money else -record.money
+            }
+
+            // 更新顯示總金額
+            findViewById<TextView>(R.id.TV_money).text = totalAmount.toString()
+
+            // 更新 RecyclerView 的 Adapter 資料
+            val rv_result = findViewById<RecyclerView>(R.id.RV_result)
+            rv_result.adapter = TransactionAdapter(groupedItems)
+            rv_result.adapter?.notifyDataSetChanged()
         }
     }
+
 
 
 }
@@ -199,7 +229,6 @@ class RecordAdapter(private val items: List<Record>) : RecyclerView.Adapter<Reco
             val intent = Intent(holder.itemView.context, MainActivity3::class.java)
             intent.putExtra("position", position)
             (holder.itemView.context as? AppCompatActivity)?.startActivityForResult(intent, 2)
-
         }
 
     }

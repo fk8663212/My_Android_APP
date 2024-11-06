@@ -1,4 +1,8 @@
 package com.example.midhomeworkaccounting
 
-data class DateHeader(val date: String, val totalAmount: Int)
-data class TransactionRecord(val description: String, val amount: Int, val isIncome: Boolean)
+sealed class ListItem {
+    data class DateHeader(val date: String, val total: String) : ListItem()
+    data class TransactionItem(val description: String, val amount: String, val isIncome: Boolean) : ListItem()
+}
+
+
