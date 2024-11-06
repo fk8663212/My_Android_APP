@@ -1,5 +1,6 @@
 package com.example.midhomeworkaccounting.RecyclerView
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,10 +36,15 @@ class MixedAdapter(private val items: List<Any>) : RecyclerView.Adapter<Recycler
             val dateHeader = items[position] as DateHeader
             holder.tvDate.text = dateHeader.date
             holder.tvTotalAmount.text = "$${dateHeader.totalAmount}"
+            holder.tvTotalAmount.setTextColor(if (dateHeader.totalAmount >= 0) Color.BLUE else Color.RED)
         } else if (holder is RecordViewHolder) {
             val record = items[position] as TransactionRecord
             holder.tvDescription.text = record.description
             holder.tvAmount.text = if (record.isIncome) "+$${record.amount}" else "-$${record.amount}"
+            holder.tvAmount.setTextColor(if (record.isIncome) Color.BLUE else Color.RED)
+        }
+        else{
+            val record = items[position] as TransactionRecord
         }
     }
 
@@ -56,3 +62,4 @@ class MixedAdapter(private val items: List<Any>) : RecyclerView.Adapter<Recycler
         val tvAmount: TextView = view.findViewById(R.id.tv_amount)
     }
 }
+

@@ -20,6 +20,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.midhomeworkaccounting.RecyclerView.MixedAdapter
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.whiteelephant.monthpicker.MonthPickerDialog
@@ -52,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         // 初始化 RecyclerView 和 Adapter
         val rv_result = findViewById<RecyclerView>(R.id.RV_result)
 
-        val adapter = RecordAdapter(items)
+        val adapter = MixedAdapter(items)
         rv_result.adapter = adapter
         rv_result.layoutManager = LinearLayoutManager(this)
 
@@ -114,6 +115,7 @@ class MainActivity : AppCompatActivity() {
             // 通知 Adapter 資料變更
             rv_result.adapter?.notifyDataSetChanged()
         }
+
     }
     private fun showToast(text: String) {
         Toast.makeText(this, text, Toast.LENGTH_LONG).show()
