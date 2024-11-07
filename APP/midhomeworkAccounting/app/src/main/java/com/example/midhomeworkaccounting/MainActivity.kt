@@ -136,7 +136,10 @@ class MainActivity : AppCompatActivity() {
                     currentDate = dateStr
                     val dailyTotal = records.filter { it.year == record.year && it.month == record.month && it.day == record.day }
                         .sumOf { if (it.isIncome) it.money else -it.money }
-                    items.add(ListItem.DateHeader(currentDate, dailyTotal.toString()))
+                    if (dailyTotal >= 0)
+                        items.add(ListItem.DateHeader(currentDate, "+${dailyTotal.toString()}"))
+                    else
+                        items.add(ListItem.DateHeader(currentDate, "${dailyTotal.toString()}"))
                 }
                 // 加入 TransactionItem
                 items.add(ListItem.TransactionItem(record.id,record.name, record.money.toString(), record.isIncome,record.year,record.month,record.day))
@@ -146,7 +149,8 @@ class MainActivity : AppCompatActivity() {
             }
 
             // 更新總金額顯示
-            tv_money.text = totalAmount.toString()
+            if (totalAmount >= 0)
+                tv_money.text = "+${totalAmount.toString()}"
 
             // 通知 Adapter 資料變更
             rv_result.adapter?.notifyDataSetChanged()
