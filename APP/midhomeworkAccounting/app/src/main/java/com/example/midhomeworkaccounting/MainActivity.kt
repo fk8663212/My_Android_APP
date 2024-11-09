@@ -31,6 +31,7 @@ import java.util.Calendar
 class MainActivity : AppCompatActivity() {
     private lateinit var database: AppDatabase
     private lateinit var recordDao: RecordDao
+    var totalAmount=0
 
 
     private val items: ArrayList<ListItem> = ArrayList()
@@ -125,7 +126,7 @@ class MainActivity : AppCompatActivity() {
                     .thenByDescending { it.month }
                     .thenByDescending { it.day })
 
-            var totalAmount = 0
+
             var currentDate = ""
 
             records.forEach { record ->

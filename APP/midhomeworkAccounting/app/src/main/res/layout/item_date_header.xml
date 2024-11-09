@@ -29,6 +29,7 @@
             android:id="@+id/tv_total_amount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="#FFC107"
             android:text="$9,432"
             android:textSize="16sp" />
     </LinearLayout>
