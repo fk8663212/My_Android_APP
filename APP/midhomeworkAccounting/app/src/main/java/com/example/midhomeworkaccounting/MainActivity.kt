@@ -120,12 +120,14 @@ class MainActivity : AppCompatActivity() {
             // 清空舊的資料
             items.clear()
 
+            // 計算總收入/支出
+            var totalAmount = 0
+
             // 從資料庫獲取記錄，並按日期排序
             val records = recordDao.getAll()
                 .sortedWith(compareByDescending<Record> { it.year }
                     .thenByDescending { it.month }
                     .thenByDescending { it.day })
-
 
             var currentDate = ""
 
@@ -137,26 +139,23 @@ class MainActivity : AppCompatActivity() {
                     currentDate = dateStr
                     val dailyTotal = records.filter { it.year == record.year && it.month == record.month && it.day == record.day }
                         .sumOf { if (it.isIncome) it.money else -it.money }
-                    if (dailyTotal >= 0)
-                        items.add(ListItem.DateHeader(currentDate, "+${dailyTotal.toString()}"))
-                    else
-                        items.add(ListItem.DateHeader(currentDate, "${dailyTotal.toString()}"))
+                    items.add(ListItem.DateHeader(currentDate, if (dailyTotal >= 0) "+$dailyTotal" else "$dailyTotal"))
                 }
                 // 加入 TransactionItem
-                items.add(ListItem.TransactionItem(record.id,record.name, record.money.toString(), record.isIncome,record.year,record.month,record.day))
+                items.add(ListItem.TransactionItem(record.id, record.name, record.money.toString(), record.isIncome, record.year, record.month, record.day))
 
-                // 計算總收入/支出
+                // 更新 totalAmount
                 totalAmount += if (record.isIncome) record.money else -record.money
             }
 
-            // 更新總金額顯示
-            if (totalAmount >= 0)
-                tv_money.text = "+${totalAmount.toString()}"
+            // 更新顯示總金額
+            tv_money.text = if (totalAmount >= 0) "+$totalAmount" else "$totalAmount"
 
             // 通知 Adapter 資料變更
             rv_result.adapter?.notifyDataSetChanged()
         }
     }
+
 
     private fun showToast(text: String) {
         Toast.makeText(this, text, Toast.LENGTH_LONG).show()
@@ -210,7 +209,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             // 更新顯示總金額
-            findViewById<TextView>(R.id.TV_money).text = totalAmount.toString()
+            findViewById<TextView>(R.id.TV_money).text = if (totalAmount >= 0) "+$totalAmount" else "$totalAmount"
 
             // 更新 RecyclerView 的 Adapter 資料
             val rv_result = findViewById<RecyclerView>(R.id.RV_result)
